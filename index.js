@@ -12,7 +12,7 @@ const client = new Client({
 
 // Use the environment variable for the token
 const TOKEN = process.env.TOKEN;
-const GUILD_ID = '1273704583654277241';  // Replace with the actual server ID
+const GUILD_ID = process.env.GUILD_ID;  // Replace with the actual server ID
 
 // Log in to Discord
 client.login(TOKEN);
