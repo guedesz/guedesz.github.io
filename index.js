@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const { Client, Intents, GatewayIntentBits } = require('discord.js');
 
@@ -9,8 +10,8 @@ const client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],
 });
 
-// Replace with your bot token
-const TOKEN = 'MTMwNjMyNjc3MDk3NDQ1Nzg3Nw.GiDhQx.9DUWUBrk6l2sjgUuVpS8yXEN2PFWT2F2dDI9cU';
+// Use the environment variable for the token
+const TOKEN = process.env.TOKEN;
 const GUILD_ID = '1273704583654277241';  // Replace with the actual server ID
 
 // Log in to Discord
