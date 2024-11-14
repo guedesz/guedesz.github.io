@@ -29,25 +29,31 @@ app.get('/verify', async (req, res) => {
         // Buscar o servidor (guilda) no Discord
         const guild = await client.guilds.fetch(GUILD_ID);
 
-        // Buscar o membro pelo nome de usuário no servidor especificado
-        const member = guild.members.cache.find(member => member.user.username === discordUsername);
+        // Buscar todos os membros no servidor
+        const members = await guild.members.fetch();
 
-        if (member) {
-            // Verificar se o displayName do membro contém o robloxUsername entre parênteses
-            const regex = new RegExp(`\\(@${robloxUsername}\\)`);
-            const isVerified = regex.test(member.displayName);
+       // Procurar pelo membro com o nome de usuário do Discord fornecido e verificar o nome de exibição
+        const userFound = members.some(member => {
 
-            if (isVerified) {
-                return res.json({ success: true, message: `${discordUsername} is in the server! ${robloxUsername}.` });
-            } else {
-                return res.json({ success: false, message: `The discord: ${discordUsername} is not verified with the name: ${robloxUsername}.` });
+            if (member.user.username.toLowerCase() === discordUsername.toLowerCase()) {
+
+                // Extrair o robloxUsername entre parênteses no display name
+                const regex = new RegExp(`\\(@${robloxUsername}\\)`);
+                const isMatch = regex.test(member.nickname);
+
+                return isMatch;
             }
+            return false;
+        });
+
+        if (userFound) {
+            return res.json({ success: true, message: `${discordUsername} is in the community, reward applied!` });
         } else {
-            return res.json({ success: false, message: `User ${discordUsername} not found on our community..` });
+            return res.json({ success: false, message: `user ${discordUsername} not found with the same username: ${robloxUsername}.` });
         }
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error, please try again later.' });
+        res.status(500).json({ error: 'server error, try again later!' });
     }
 });
 
