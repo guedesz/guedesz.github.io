@@ -37,6 +37,8 @@ app.get('/verify', async (req, res) => {
             // Verificar se o nome de usuário do Discord coincide
             if (member.user.username === discordUsername) {
                 // Extrair o robloxUsername entre parênteses no display name
+                console.log(member.user)
+
                 const regex = new RegExp(`\\(@${robloxUsername}\\)`);
                 return regex.test(member.displayName);
             }
