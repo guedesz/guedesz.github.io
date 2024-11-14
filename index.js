@@ -29,26 +29,21 @@ app.get('/verify', async (req, res) => {
         // Buscar o servidor (guilda) no Discord
         const guild = await client.guilds.fetch(GUILD_ID);
 
-        // Buscar todos os membros no servidor
-        const members = await guild.members.fetch();
+        // Buscar o membro pelo nome de usuário no servidor especificado
+        const member = guild.members.cache.find(member => member.user.username === discordUsername);
 
-        // Procurar pelo membro com o nome de usuário do Discord fornecido e verificar o nome de exibição
-        const userFound = members.some(member => {
-            // Verificar se o nome de usuário do Discord coincide
-            if (member.user.username === discordUsername) {
-                // Extrair o robloxUsername entre parênteses no display name
-                console.log(member.user)
+        if (member) {
+            // Verificar se o displayName do membro contém o robloxUsername entre parênteses
+            const regex = new RegExp(`\\(@${robloxUsername}\\)`);
+            const isVerified = regex. est(member.displayName);
 
-                const regex = new RegExp(`\\(@${robloxUsername}\\)`);
-                return regex.test(member.displayName);
+            if (isVerified) {
+                return res.json({ success: true, message: `${discordUsername} está no servidor com o Roblox username ${robloxUsername}.` });
+            } else {
+                return res.json({ success: false, message: `O displayName de ${discordUsername} não corresponde ao Roblox username ${robloxUsername}.` });
             }
-            return false;
-        });
-
-        if (userFound) {
-            return res.json({ success: true, message: `${discordUsername} está no servidor com o Roblox username ${robloxUsername}.` });
         } else {
-            return res.json({ success: false, message: `O usuário ${discordUsername} não foi encontrado no servidor com o Roblox username ${robloxUsername}.` });
+            return res.json({ success: false, message: `Usuário ${discordUsername} não encontrado no servidor.` });
         }
     } catch (error) {
         console.error(error);
