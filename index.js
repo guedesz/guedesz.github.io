@@ -35,7 +35,7 @@ app.get('/verify', async (req, res) => {
         if (member) {
             // Verificar se o displayName do membro contém o robloxUsername entre parênteses
             const regex = new RegExp(`\\(@${robloxUsername}\\)`);
-            const isVerified = regex. est(member.displayName);
+            const isVerified = regex.test(member.displayName);
 
             if (isVerified) {
                 return res.json({ success: true, message: `${discordUsername} is in the server! ${robloxUsername}.` });
