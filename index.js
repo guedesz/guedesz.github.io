@@ -1,52 +1,60 @@
 require('dotenv').config();
 const express = require('express');
-const { Client, Intents, GatewayIntentBits } = require('discord.js');
+const { Client, GatewayIntentBits } = require('discord.js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Initialize Discord client with member intent
+// Inicializar o cliente do Discord com as intenções necessárias
 const client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],
 });
 
-// Use the environment variable for the token
+// Usar a variável de ambiente para o token
 const TOKEN = process.env.TOKEN;
-const GUILD_ID = process.env.GUILD_ID;  // Replace with the actual server ID
+const GUILD_ID = process.env.GUILD_ID; // ID do servidor
 
-// Log in to Discord
+// Logar no Discord
 client.login(TOKEN);
 
-// Endpoint to verify user
+// Endpoint para verificar o usuário
 app.get('/verify', async (req, res) => {
-    const { robloxUserId, discordUsername } = req.query;
+    const { robloxUserId, discordUsername, robloxUsername } = req.query;
 
-    if (!robloxUserId || !discordUsername) {
-        return res.status(400).json({ error: 'Missing robloxUserId or discordUsername' });
+    if (!robloxUserId || !discordUsername || !robloxUsername) {
+        return res.status(400).json({ error: 'Faltando robloxUserId, discordUsername ou robloxUsername' });
     }
 
     try {
-        // Fetch the guild (Discord server)
+        // Buscar o servidor (guilda) no Discord
         const guild = await client.guilds.fetch(GUILD_ID);
 
-        // Fetch all members in the server
+        // Buscar todos os membros no servidor
         const members = await guild.members.fetch();
 
-        // Check if the discordUsername is in the list of members
-        const userFound = members.some(member => member.user.username === discordUsername);
+        // Procurar pelo membro com o nome de usuário do Discord fornecido e verificar o nome de exibição
+        const userFound = members.some(member => {
+            // Verificar se o nome de usuário do Discord coincide
+            if (member.user.username === discordUsername) {
+                // Extrair o robloxUsername entre parênteses no display name
+                const regex = new RegExp(`\\(@${robloxUsername}\\)`);
+                return regex.test(member.displayName);
+            }
+            return false;
+        });
 
         if (userFound) {
-            return res.json({ success: true, message: `${discordUsername} is in the server.` });
+            return res.json({ success: true, message: `${discordUsername} está no servidor com o Roblox username ${robloxUsername}.` });
         } else {
-            return res.json({ success: false, message: `${discordUsername} is not in the server.` });
+            return res.json({ success: false, message: `O usuário ${discordUsername} não foi encontrado no servidor com o Roblox username ${robloxUsername}.` });
         }
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: 'Erro interno no servidor' });
     }
 });
 
-// Start the Express server
+// Iniciar o servidor Express
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Servidor rodando na porta ${PORT}`);
 });
