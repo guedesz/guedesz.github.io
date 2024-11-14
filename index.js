@@ -38,16 +38,16 @@ app.get('/verify', async (req, res) => {
             const isVerified = regex. est(member.displayName);
 
             if (isVerified) {
-                return res.json({ success: true, message: `${discordUsername} está no servidor com o Roblox username ${robloxUsername}.` });
+                return res.json({ success: true, message: `${discordUsername} is in the server! ${robloxUsername}.` });
             } else {
-                return res.json({ success: false, message: `O displayName de ${discordUsername} não corresponde ao Roblox username ${robloxUsername}.` });
+                return res.json({ success: false, message: `The discord: ${discordUsername} is not verified with the name: ${robloxUsername}.` });
             }
         } else {
-            return res.json({ success: false, message: `Usuário ${discordUsername} não encontrado no servidor.` });
+            return res.json({ success: false, message: `User ${discordUsername} not found on our community..` });
         }
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Erro interno no servidor' });
+        res.status(500).json({ error: 'Error, please try again later.' });
     }
 });
 
