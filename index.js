@@ -32,16 +32,16 @@ app.get('/verify', async (req, res) => {
         // Buscar todos os membros no servidor
         const members = await guild.members.fetch();
 
-       // Procurar pelo membro com o nome de usuário do Discord fornecido e verificar o nome de exibição
         const userFound = members.some(member => {
 
             if (member.user.username.toLowerCase() === discordUsername.toLowerCase()) {
-
-                // Extrair o robloxUsername entre parênteses no display name
-                const regex = new RegExp(`\\(@${robloxUsername}\\)`);
-                const isMatch = regex.test(member.nickname);
-
-                return isMatch;
+        
+                // Verificar se o nickname é exatamente igual ao robloxUsername ou contém o padrão (@robloxUsername)
+                const isExactMatch = member.nickname && member.nickname.toLowerCase() === robloxUsername.toLowerCase();
+                const regex = new RegExp(`\\(@${robloxUsername}\\)`, 'i');
+                const isRegexMatch = member.nickname && regex.test(member.nickname);
+        
+                return isExactMatch || isRegexMatch;
             }
             return false;
         });
